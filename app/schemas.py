@@ -43,10 +43,15 @@ class RunCreate(BaseModel):
     name: str = Field(min_length=1, max_length=80)
     samples: List[SampleIn] = Field(min_length=1, max_length=96)
 
-    # TODO (candidate): add a @model_validator(mode="after") that rejects a run
-    # when two samples share the same well OR the same sample_id.
-    # A request like that must come back as HTTP 422 (pydantic does this for you
-    # when a validator raises ValueError).
+    @model_validator(mode="after")
+    def _no_duplicates(self):
+        wells = [s.well for s in self.samples]
+        ids = [s.sample_id for s in self.samples]
+        if len(set(wells)) != len(wells):
+            raise ValueError("duplicate wells in samples")
+        if len(set(ids)) != len(ids):
+            raise ValueError("duplicate sample ids in samples")
+        return self
 
 
 class RunOut(BaseModel):

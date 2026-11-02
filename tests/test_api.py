@@ -157,3 +157,40 @@ def test_full_plate_from_data_folder(client):
     assert body["run_valid"] is True
     assert any(c["call"] == "POS" for c in body["calls"])
     assert any(c["call"] == "INVALID" for c in body["calls"])
+
+def test_readings_accumulate_across_uploads(client):
+    run = _make_run(client)
+    first, second = READINGS[:5], READINGS[5:]
+
+    client.post(f"/runs/{run['id']}/readings", json=first)
+    r = client.post(f"/runs/{run['id']}/readings", json=second)
+
+    assert r.json() == {"added": len(second)}
+    assert client.get(f"/runs/{run['id']}").json()["n_readings"] == len(READINGS)
+    body = client.get(f"/runs/{run['id']}/results").json()
+    assert body["run_valid"] is True and len(body["calls"]) == 10
+
+
+def test_unreadable_mfi_is_invalid_with_null_net(client):
+    run = _make_run(client)
+    readings = [r if r["well"] != "G2" else _reading("G2", "OOR >") for r in READINGS]
+    client.post(f"/runs/{run['id']}/readings", json=readings)
+
+    body = client.get(f"/runs/{run['id']}/results").json()
+    calls = {c["sample_id"]: c for c in body["calls"]}
+
+    assert calls["PAT_B"]["call"] == "INVALID"
+    assert calls["PAT_B"]["net_mfi"] is None
+    assert body["run_valid"] is True
+
+
+def test_reading_for_well_outside_the_run_is_ignored(client):
+    run = _make_run(client)
+    extra = READINGS + [_reading("H12", 999)]      # H12 não está em SAMPLES
+
+    r = client.post(f"/runs/{run['id']}/readings", json=extra)
+    assert r.json() == {"added": len(extra)}
+
+    body = client.get(f"/runs/{run['id']}/results").json()
+    assert len(body["calls"]) == 10
+    assert "H12" not in {c["well"] for c in body["calls"]}
