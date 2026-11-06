@@ -3,25 +3,28 @@
 AI tools are allowed and expected. This log helps us talk about *how* you worked. Be honest and specific - a short, real log is better than a polished one. Writing it in your own words matters.
 
 ## Tools used
-<!-- e.g. ChatGPT, Claude, Copilot, Cursor, none... -->
+Claude (chat), em um projeto com os arquivos do repositório como contexto, para explicações, rascunhos de código, tradução dos enunciados e revisão de texto e gramática. Também usei o Python Tutor e a documentação oficial para conferir o que a IA explicou. VS Code e GitHub Desktop foram usados só como editor e controle de versão.
 
 ## Per part
-For each part: what you asked the AI to do (or "nothing"), and what you changed or rejected afterwards.
 
 | Part | What I used AI for | What I changed / rejected / double-checked |
 |---|---|---|
-| 1 Basics & data structures | | |
-| 2 Classes & dataclasses | | |
-| 3 pandas | | |
-| 4 Visualization | | |
-| 5 FastAPI (+ bonus UI) | | |
-| 6 Design | | |
+| 1 Basics & data structures | Na 1.1, passei a lógica e pedi um rascunho de código, que eu revisei, e pedi que me explicasse a regex de validação dos poços. Na 1.2, não sabia como fazer, por falta de prática com Python, então passei as regras e pedi o código com explicação linha a linha; testei a lógica no Python Tutor para entender melhor como funciona e se estava correta. Na 1.3, fiz da mesma forma e ainda consultei a documentação oficial para entender de fato como funcionam os tipos (`dict`, `tuple`, `list` e `set`); depois respondi ao bloco sobre esses tipos e sobre quando os usaria. Na 1.4, pedi à IA que corrigisse o meu palpite sobre o primeiro bug e explicasse o porquê, e depois pesquisei para confirmar a explicação. O segundo bug eu percebi por ser um erro de lógica, mas, por falta de confiança na minha experiência com Python, pedi à IA que conferisse o meu código e descobri como o Python interpreta índices negativos e a possibilidade de usar o `max()` para evitar o problema dos números negativos. | Digitei o código e rodei os `check`. Na 1.4, escolhi a versão com `max(len(wells) - n, 0)`, que foi sugerida, em vez de `wells[-n:]`. Errei o diagnóstico do `add_sample` (achei que `registry` devia ser um dict), mas a IA me corrigiu e explicou melhor o que me confundia. |
+| 2 Classes & dataclasses | Na 2.1, pedi explicações sobre `__init__`, `__repr__`, `__eq__`, `__hash__`, `frozen=True` com `object.__setattr__` e os tipos de método; depois pedi o código e o revisei. Na 2.2, tentei fazer manualmente antes de pedir ajuda e enviei para a IA corrigir e explicar os meus erros, que foram onde colocar a inicialização da classe com seus atributos e a inclusão do `_key` para manter o princípio DRY. Na 2.3, pedi um rascunho de código, que apenas chequei, mas, ao rodar os `check`, apareceu um erro que eu não entendi; pedi à IA que explicasse e consertei alterando o `well_index` da 1.1. Na 2.4, consegui prever corretamente, pois o erro era parecido com o da 1.4, e escrevi o `BatchFixed` sem olhar a versão da IA, comparando com ela só depois. Na 2.5, respondi sozinho. | O `check` de `is_valid_well(None)` falhou com `AttributeError`, porque o meu `well_index` não validava o tipo. A IA propôs adicionar o `isinstance` no `is_valid_well` ou no `well_index`, e eu escolhi a segunda opção. |
+| 3 pandas | Na 3.0, pedi a explicação de cada comando (`copy`, `.str`, `to_numeric`, `merge`, `groupby`, `np.where`, `ddof=1`). Na busca pelos problemas de qualidade, só consegui identificar os 4 relacionados ao `mfi`; para os outros, usei a IA. Na 3.1, usei a IA para gerar o código, que apenas revisei. Na 3.2, pedi o código e a explicação de como o `merge` funciona, para conferir o código dela. Da 3.3 à 3.5, pedi o código e apenas conferi. Na 3.6, fiz o mesmo. | Nesta parte, a IA não cometeu nenhum erro, e não foi necessário tomar nenhuma decisão sobre o que ela fez. |
+| 4 Visualization | Eu tinha conhecimento quase nulo sobre visualização de dados em Python, então esta parte foi inteiramente gerada pela IA, que me explicou como funcionava cada linha do código. Usei essa explicação e pesquisas na documentação oficial para conferir o que ela gerou. | Comparei o gráfico com os dados: A1 e B1 são os brancos e os padrões esmaecem em C1 a H1. |
+| 5 FastAPI (+ bonus UI) | A IA gerou o código de `schemas`, `analysis` e `main`, e eu conferi. Os 3 testes extras partiram de ideias minhas, mas, por falta de confiança, pedi sugestões à IA; ver que os testes que ela propôs coincidiam com os meus me deu confiança para usá-los. A IA escreveu o código, que eu conferi e rodei. Bônus `/ui`: não fiz. | Rodei o `pytest` (19 testes passando). O único problema foi o `from __future__` duplicado, que apareceu por um erro meu ao colar o código da IA sem remover o cabeçalho original; corrigi apagando a duplicata. Por precaução, reli os códigos de `schemas`, `analysis` e `main`. |
+| 6 Design | Na 6.1, a estrutura do fluxo (do login aos logs) foi ideia minha, e pedi apenas que a IA a organizasse. Na 6.2, pedi à IA que gerasse a tabela, que apenas conferi, e pedi também ajuda com o problema da identidade da run; ela me deu a ideia do `plate_barcode` e do `run_code`. Na 6.3, pedi a tabela, que só conferi. Da 6.4 à 6.7, por causa do prazo apertado, pedi à IA que gerasse o rascunho do texto de cada seção, e eu os revisei e adaptei, e pedi depois a condensação do documento. | Troquei o código de barras pelo `run_code` como ligação do arquivo à run, porque nem toda placa tem código de barras. Na seção 4, acrescentei que o campo de nome da placa no software do leitor é uma suposição a confirmar com o fabricante. |
+
+Escrevi as respostas escritas em português e usei a IA, em todas as partes, para traduzir os enunciados e para revisar a gramática. Na 3.0 e na 3.6, pedi um rascunho pronto e o reescrevi com as minhas palavras; nas outras (por exemplo, a 2.2, a 2.5 e as perguntas de design da Parte 5), escrevi primeiro e a IA revisou a gramática e apontou imprecisões técnicas, que eu ajustei.
 
 ## One thing the AI got wrong (or that you rejected) - and how you noticed
-
+Eu rejeitei a ideia de usar somente o `plate_barcode` para identificar a run e pedi que a IA gerasse uma solução mais universal, pois acredito que nem toda placa tem código de barras. Percebi isso só de pensar um pouco na situação do sistema funcionando.
 
 ## One thing you learned doing this test that you didn't know before
-
+Aprendi como o Python trata algumas coisas básicas que eu desconhecia: um valor mutável usado como padrão de um parâmetro (`registry=[]`) ou declarado no corpo da classe (`samples = []`) é criado uma única vez e compartilhado entre todas as chamadas ou instâncias, em vez de ser criado dentro do método; e o comportamento do índice negativo, em que `-1` é o último item `-2` é o penúltimo item e assim por diante.
 
 ## One part you would like to be asked about in the interview (and one you hope we skip)
+Gostaria de ser perguntado sobre a parte 1 e espero que pulem a parte de visualização dos gráficos, pois não sei tanto sobre ela.
 
+A IA também foi utilizada para correção gramatical e compactação deste log.
